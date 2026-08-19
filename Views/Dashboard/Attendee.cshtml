@@ -1,0 +1,40 @@
+@model AttendeeDashboardViewModel
+@{
+    ViewData["Title"] = "My Dashboard";
+}
+
+<h1>My Dashboard</h1>
+
+<h2>Upcoming Events</h2>
+<div class="event-grid">
+    @foreach (var ev in Model.UpcomingEvents)
+    {
+        <div class="event-card">
+            <h3>@ev.Name</h3>
+            <p class="muted">@ev.EventDate.ToString("dd MMM yyyy, hh:mm tt")</p>
+        </div>
+    }
+    @if (!Model.UpcomingEvents.Any())
+    {
+        <p>No upcoming events yet — <a asp-controller="Events" asp-action="Index">browse events</a>.</p>
+    }
+</div>
+
+<h2>My Registrations</h2>
+<table class="table">
+    <thead>
+        <tr><th>Event</th><th>Date</th><th>Status</th><th>QR Code</th><th>Checked In</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var r in Model.MyRegistrations)
+        {
+            <tr>
+                <td>@r.EventName</td>
+                <td>@r.EventDate.ToString("dd MMM yyyy")</td>
+                <td>@r.Status</td>
+                <td><code>@r.QrCode</code></td>
+                <td>@(r.CheckedIn ? "Yes" : "No")</td>
+            </tr>
+        }
+    </tbody>
+</table>

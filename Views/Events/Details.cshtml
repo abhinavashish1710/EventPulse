@@ -1,0 +1,63 @@
+@model Event
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<h1>@Model.Name</h1>
+<p class="muted">@Model.Category &bull; @Model.EventDate.ToString("dd MMM yyyy, hh:mm tt")</p>
+<p>@Model.Location</p>
+<p>@Model.Description</p>
+<p>
+    @if (Model.Price > 0)
+    {
+        <span class="price">@Model.Price.ToString("C")</span>
+    }
+    else
+    {
+        <span class="price free">Free</span>
+    }
+</p>
+<p><strong>@Model.SeatsRemaining</strong> of <strong>@Model.Capacity</strong> seats remaining</p>
+<p>Organized by: @(Model.Organizer?.FullName ?? "Unknown")</p>
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <form id="registerForm" data-event-id="@Model.EventId">
+        @if (Model.SeatsRemaining > 0)
+        {
+            <button type="button" class="btn btn-primary" onclick="registerForEvent(@Model.EventId)">Register</button>
+        }
+        else
+        {
+            <button type="button" class="btn btn-secondary" onclick="joinWaitlist(@Model.EventId)">Join Waitlist (Event Full)</button>
+        }
+    </form>
+    <p id="registerMessage"></p>
+}
+else
+{
+    <p><a asp-area="Identity" asp-page="/Account/Login">Log in</a> to register for this event.</p>
+}
+
+@section Scripts {
+    <script>
+        async function registerForEvent(eventId) {
+            const res = await fetch(`/api/registrations?eventId=${eventId}`, { method: 'POST' });
+            const message = document.getElementById('registerMessage');
+            if (res.ok) {
+                const data = await res.json();
+                message.textContent = data.requiresPayment
+                    ? `Registered! Payment of ${data.amountDue} is required to confirm your seat.`
+                    : 'Registered successfully!';
+            } else {
+                message.textContent = await res.text();
+            }
+        }
+
+        async function joinWaitlist(eventId) {
+            const res = await fetch(`/api/waitlist?eventId=${eventId}`, { method: 'POST' });
+            const message = document.getElementById('registerMessage');
+            message.textContent = res.ok ? 'Added to the waitlist!' : await res.text();
+        }
+    </script>
+}

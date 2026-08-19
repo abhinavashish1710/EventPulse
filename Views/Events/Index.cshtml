@@ -1,0 +1,40 @@
+@model List<EventListItemViewModel>
+@{
+    ViewData["Title"] = "Events";
+}
+
+<h1>Browse Events</h1>
+
+<form method="get" class="search-form">
+    <input type="text" name="search" placeholder="Search by name..." value="@Context.Request.Query["search"]" />
+    <input type="text" name="category" placeholder="Category..." value="@Context.Request.Query["category"]" />
+    <button type="submit" class="btn">Search</button>
+</form>
+
+<div class="event-grid">
+    @foreach (var ev in Model)
+    {
+        <div class="event-card">
+            <h3>@ev.Name</h3>
+            <p class="muted">@ev.Category &bull; @ev.EventDate.ToString("dd MMM yyyy, hh:mm tt")</p>
+            <p>@ev.Location</p>
+            <p>
+                @if (ev.Price > 0)
+                {
+                    <span class="price">@ev.Price.ToString("C")</span>
+                }
+                else
+                {
+                    <span class="price free">Free</span>
+                }
+                &bull; @ev.SeatsRemaining / @ev.Capacity seats left
+            </p>
+            <a class="btn btn-sm" asp-action="Details" asp-route-id="@ev.EventId">View Details</a>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <p>No events found.</p>
+    }
+</div>

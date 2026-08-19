@@ -1,0 +1,29 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Overview";
+}
+
+<h1>Admin Overview</h1>
+
+<div class="stat-row">
+    <div class="stat-card"><h3>@Model.TotalEvents</h3><p>Total Events</p></div>
+    <div class="stat-card"><h3>@Model.TotalOrganizers</h3><p>Organizers</p></div>
+    <div class="stat-card"><h3>@Model.TotalAttendees</h3><p>Attendees</p></div>
+</div>
+
+<p><a asp-action="Organizers" class="btn">Manage Organizers</a></p>
+
+<h2>Recent Events</h2>
+<table class="table">
+    <thead><tr><th>Name</th><th>Date</th><th>Seats</th></tr></thead>
+    <tbody>
+        @foreach (var ev in Model.RecentEvents)
+        {
+            <tr>
+                <td>@ev.Name</td>
+                <td>@ev.EventDate.ToString("dd MMM yyyy")</td>
+                <td>@ev.SeatsRemaining / @ev.Capacity</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,19 @@
+@model IList<ApplicationUser>
+@{
+    ViewData["Title"] = "Organizers";
+}
+
+<h1>Organizers</h1>
+
+<table class="table">
+    <thead><tr><th>Name</th><th>Email</th></tr></thead>
+    <tbody>
+        @foreach (var u in Model)
+        {
+            <tr>
+                <td>@u.FullName</td>
+                <td>@u.Email</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,28 @@
+@{
+    ViewData["Title"] = "Home";
+}
+
+<section class="hero">
+    <h1>EventPulse</h1>
+    <p>Event registration that keeps every seat, sign-up, and organizer in sync.</p>
+    <a class="btn btn-primary" asp-controller="Events" asp-action="Index">Browse Events</a>
+</section>
+
+<section class="features">
+    <div class="feature-card">
+        <h3>Real-time Capacity</h3>
+        <p>Seats update instantly — no overbooking, ever.</p>
+    </div>
+    <div class="feature-card">
+        <h3>Payments &amp; Refunds</h3>
+        <p>Simulated checkout with automatic refunds on cancellation.</p>
+    </div>
+    <div class="feature-card">
+        <h3>Auto-Waitlist</h3>
+        <p>Full event? Join the queue and get promoted automatically.</p>
+    </div>
+    <div class="feature-card">
+        <h3>QR Check-in</h3>
+        <p>Every registration gets a unique, single-use QR ticket.</p>
+    </div>
+</section>

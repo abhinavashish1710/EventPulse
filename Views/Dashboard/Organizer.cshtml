@@ -1,0 +1,29 @@
+@model OrganizerDashboardViewModel
+@{
+    ViewData["Title"] = "Organizer Dashboard";
+}
+
+<h1>Organizer Dashboard</h1>
+
+<div class="stat-row">
+    <div class="stat-card"><h3>@Model.TotalRegistrations</h3><p>Total Registrations</p></div>
+    <div class="stat-card"><h3>@Model.TotalCheckedIn</h3><p>Checked In</p></div>
+    <div class="stat-card"><h3>@Model.TotalRevenue.ToString("C")</h3><p>Total Revenue</p></div>
+</div>
+
+<h2>My Events</h2>
+<div class="event-grid">
+    @foreach (var ev in Model.MyEvents)
+    {
+        <div class="event-card">
+            <h3>@ev.Name</h3>
+            <p class="muted">@ev.EventDate.ToString("dd MMM yyyy")</p>
+            <p>@ev.SeatsRemaining / @ev.Capacity seats left</p>
+            <a class="btn btn-sm" asp-controller="Events" asp-action="Edit" asp-route-id="@ev.EventId">Manage</a>
+        </div>
+    }
+    @if (!Model.MyEvents.Any())
+    {
+        <p>You haven't created any events yet — <a asp-controller="Events" asp-action="Create">create one</a>.</p>
+    }
+</div>

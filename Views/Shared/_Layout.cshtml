@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - EventPulse</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <a class="brand" asp-controller="Home" asp-action="Index">EventPulse</a>
+            <div class="nav-links">
+                <a asp-controller="Events" asp-action="Index">Events</a>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <a asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+                    @if (User.IsInRole("Organizer"))
+                    {
+                        <a asp-controller="Events" asp-action="Create">Create Event</a>
+                    }
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-controller="Admin" asp-action="Index">Admin</a>
+                    }
+                    <a href="/swagger" target="_blank">API Docs</a>
+                    <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="inline-form">
+                        <button type="submit" class="link-button">Logout</button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-area="Identity" asp-page="/Account/Login">Login</a>
+                    <a asp-area="Identity" asp-page="/Account/Register">Register</a>
+                }
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">@TempData["Success"]</div>
+        }
+        @RenderBody()
+    </main>
+
+    <footer>
+        <p>&copy; @DateTime.Now.Year - EventPulse - Group 18</p>
+    </footer>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

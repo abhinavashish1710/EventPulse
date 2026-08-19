@@ -1,0 +1,165 @@
+using EventPulse.Data;
+using EventPulse.Models;
+using EventPulse.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+namespace EventPulse.Controllers
+{
+    public class EventsController : Controller
+    {
+        private readonly ApplicationDbContext _db;
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public EventsController(ApplicationDbContext db, UserManager<ApplicationUser> userManager)
+        {
+            _db = db;
+            _userManager = userManager;
+        }
+
+        // GET /Events
+        public async Task<IActionResult> Index(string? search, string? category)
+        {
+            var query = _db.Events.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+                query = query.Where(e => e.Name.Contains(search));
+            if (!string.IsNullOrWhiteSpace(category))
+                query = query.Where(e => e.Category == category);
+
+            var events = await query
+                .OrderBy(e => e.EventDate)
+                .Select(e => new EventListItemViewModel
+                {
+                    EventId = e.EventId,
+                    Name = e.Name,
+                    Category = e.Category,
+                    EventDate = e.EventDate,
+                    Location = e.Location,
+                    Price = e.Price,
+                    SeatsRemaining = e.SeatsRemaining,
+                    Capacity = e.Capacity
+                })
+                .ToListAsync();
+
+            return View(events);
+        }
+
+        // GET /Events/Details/5
+        public async Task<IActionResult> Details(int id)
+        {
+            var ev = await _db.Events.Include(e => e.Organizer).FirstOrDefaultAsync(e => e.EventId == id);
+            if (ev is null) return NotFound();
+            return View(ev);
+        }
+
+        // GET /Events/Create
+        [Authorize(Roles = "Organizer")]
+        public IActionResult Create() => View(new EventFormViewModel { EventDate = DateTime.Now.AddDays(7) });
+
+        // POST /Events/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Organizer")]
+        public async Task<IActionResult> Create(EventFormViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var organizerId = _userManager.GetUserId(User)!;
+
+            var newEvent = new Event
+            {
+                Name = model.Name,
+                Description = model.Description,
+                Category = model.Category,
+                EventDate = model.EventDate,
+                Location = model.Location,
+                Price = model.Price,
+                Capacity = model.Capacity,
+                SeatsRemaining = model.Capacity,
+                OrganizerId = organizerId
+            };
+
+            _db.Events.Add(newEvent);
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = "Event created successfully.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET /Events/Edit/5
+        [Authorize(Roles = "Organizer")]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var organizerId = _userManager.GetUserId(User);
+            var ev = await _db.Events.FindAsync(id);
+
+            if (ev is null) return NotFound();
+            if (ev.OrganizerId != organizerId) return Forbid();
+
+            var model = new EventFormViewModel
+            {
+                EventId = ev.EventId,
+                Name = ev.Name,
+                Description = ev.Description,
+                Category = ev.Category,
+                EventDate = ev.EventDate,
+                Location = ev.Location,
+                Price = ev.Price,
+                Capacity = ev.Capacity
+            };
+
+            return View(model);
+        }
+
+        // POST /Events/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Organizer")]
+        public async Task<IActionResult> Edit(int id, EventFormViewModel model)
+        {
+            if (id != model.EventId) return BadRequest();
+            if (!ModelState.IsValid) return View(model);
+
+            var organizerId = _userManager.GetUserId(User);
+            var ev = await _db.Events.FindAsync(id);
+
+            if (ev is null) return NotFound();
+            if (ev.OrganizerId != organizerId) return Forbid();
+
+            ev.Name = model.Name;
+            ev.Description = model.Description;
+            ev.Category = model.Category;
+            ev.EventDate = model.EventDate;
+            ev.Location = model.Location;
+            ev.Price = model.Price;
+            ev.Capacity = model.Capacity;
+
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = "Event updated successfully.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        // POST /Events/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Organizer")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var organizerId = _userManager.GetUserId(User);
+            var ev = await _db.Events.FindAsync(id);
+
+            if (ev is null) return NotFound();
+            if (ev.OrganizerId != organizerId) return Forbid();
+
+            _db.Events.Remove(ev);
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = "Event deleted.";
+            return RedirectToAction(nameof(Index));
+        }
+    }
+}
