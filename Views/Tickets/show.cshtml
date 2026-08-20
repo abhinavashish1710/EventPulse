@@ -1,0 +1,40 @@
+@model TicketViewModel
+@{
+    ViewData["Title"] = "QR Ticket";
+}
+
+<article class="ticket">
+    <p class="ticket-kicker">EventPulse ticket</p>
+    <h1>@Model.EventName</h1>
+    <p class="muted">@Model.EventDate.ToString("dd MMM yyyy, hh:mm tt")</p>
+    @if (!string.IsNullOrWhiteSpace(Model.Location))
+    {
+        <p>@Model.Location</p>
+    }
+    <p><strong>Attendee:</strong> @Model.AttendeeName</p>
+
+    <p>
+        <span class="badge @(Model.Status == "Confirmed" ? "badge-ok" : "badge-warn")">@Model.Status</span>
+        @if (Model.CheckedIn)
+        {
+            <span class="badge badge-ok">Checked in</span>
+        }
+    </p>
+
+    @if (Model.CanShowQr)
+    {
+        <div class="qr-box">
+            <img src="@Url.Action("QrImage", "Tickets", new { id = Model.RegistrationId })" alt="QR ticket code" width="240" height="240" />
+            <p class="muted ticket-code">@Model.QrCode</p>
+        </div>
+        <p class="muted">Show this code at the door. It can only be used once.</p>
+    }
+    else
+    {
+        <p>This ticket is not active, so no QR code is shown.</p>
+    }
+
+    <p>
+        <a class="btn btn-secondary" asp-controller="Dashboard" asp-action="Index">Back to dashboard</a>
+    </p>
+</article>
