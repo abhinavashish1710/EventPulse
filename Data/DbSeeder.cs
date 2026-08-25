@@ -4,10 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EventPulse.Data
 {
-    /// <summary>
-    /// Seeds the database with Identity roles and a small amount of demo data
-    /// so the app isn't empty on first run. Called once from Program.cs at startup.
-    /// </summary>
+  >
     public static class DbSeeder
     {
         public static async Task SeedAsync(IServiceProvider services)
@@ -18,14 +15,14 @@ namespace EventPulse.Data
 
             await db.Database.MigrateAsync();
 
-            // ---- Roles ----
+           
             foreach (var role in new[] { "Attendee", "Organizer", "Admin" })
             {
                 if (!await roleManager.RoleExistsAsync(role))
                     await roleManager.CreateAsync(new IdentityRole(role));
             }
 
-            // ---- Demo users (only created once) ----
+            
             async Task<ApplicationUser> EnsureUser(string email, string fullName, UserRole role, string password)
             {
                 var existing = await userManager.FindByEmailAsync(email);
@@ -48,7 +45,7 @@ namespace EventPulse.Data
             var organizer = await EnsureUser("organizer@eventpulse.com", "Demo Organizer", UserRole.Organizer, "Organizer@123");
             await EnsureUser("attendee@eventpulse.com", "Demo Attendee", UserRole.Attendee, "Attendee@123");
 
-            // ---- Demo event (only created once) ----
+            
             if (!await db.Events.AnyAsync())
             {
                 db.Events.Add(new Event
