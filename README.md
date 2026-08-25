@@ -6,7 +6,7 @@
 | IN26011617 | Arpit Ambastha |
 | IN26010754 | Sarthak Srivastava |
 | IN26011121 | Aurko Chatterjee |
-| IN26010977 | Abhinash Ashish |
+| IN26010977 | Abhinav Ashish |
 | IN26011220 | Shivam Sharma |
 | IN26012006 | Parthib Datta Muhuri |
 
